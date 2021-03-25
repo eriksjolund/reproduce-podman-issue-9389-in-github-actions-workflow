@@ -1,0 +1,28 @@
+name: reproduce podman issue 9389
+on: 
+  push:
+    branch:
+      - main
+jobs:
+   podman_issue_9389:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Run actions/checkout for this repo
+        uses: actions/checkout@v2
+        with:
+          path: repocheckout
+          persist-credentials: false
+      - name: Run podman to show issue 9389
+        run: |
+          mkdir -p $HOME/bin
+          mkdir -p $HOME/.config/containers
+          cp /usr/bin/crun $HOME/bin
+          cp repocheckout/containers.conf $HOME/.config/containers
+          sudo rm -f /usr/bin/crun
+          sudo rm -f /usr/bin/runc
+          sudo rm -f /usr/local/bin/crun
+          sudo rm -f /usr/local/sbin/crun
+          sudo rm -f /sbin/crun
+          sudo rm -f /bin/crun
+          sudo rm -f /run/current-system/sw/bin/crun
+          PATH=$HOME/bin:$PATH podman run --rm docker.io/library/alpine:latest echo hello
